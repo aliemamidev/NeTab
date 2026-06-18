@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NeTab</title>
+    <link rel="stylesheet" href="newtab.css" />
+  </head>
+  <body>
+    <div id="bg" aria-hidden="true">
+      <img id="bgImage" alt="" />
+      <video id="bgVideo" muted autoplay playsinline preload="auto"></video>
+      <div id="shade"></div>
+    </div>
+
+    <main id="center">
+      <section id="card" aria-label="Quick links">
+        <header class="topbar">
+          <div>
+            <div id="title" class="title">Quick Links</div>
+            <div class="subtitle">Private-first dashboard for your browser start page</div>
+          </div>
+          <div id="statusPill" class="status-pill">Ready</div>
+        </header>
+        <div id="groups" class="groups"></div>
+      </section>
+    </main>
+
+    <nav class="dock" aria-label="Dashboard actions">
+      <button id="widgetsBtn" class="dock-btn" type="button" title="Widgets">🧩 <span>Widgets</span></button>
+      <button id="settingsBtn" class="dock-btn" type="button" title="Settings">⚙️ <span>Settings</span></button>
+    </nav>
+
+    <div id="widgetsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="widgetsTitle">
+      <div class="modal-card widget-modal-card">
+        <header class="modal-header">
+          <div>
+            <div id="widgetsTitle" class="modal-title">Widgets</div>
+            <div class="modal-subtitle">Useful embedded widgets for the new tab page</div>
+          </div>
+          <button id="widgetsClose" class="icon-button" type="button" title="Close">✕</button>
+        </header>
+        <div class="widgets-grid">
+          <article class="widget-box">
+            <div class="widget-title">Gold Widget</div>
+            <iframe class="widget-frame" src="https://widgets.dastyar.io/fa/melli-gold?theme=dark" loading="lazy" referrerpolicy="no-referrer"></iframe>
+          </article>
+          <article class="widget-box">
+            <div class="widget-title">Price Widget</div>
+            <iframe class="widget-frame" src="https://widgets.dastyar.io/fa/dastyar-price?theme=dark" loading="lazy" referrerpolicy="no-referrer"></iframe>
+          </article>
+        </div>
+      </div>
+      <div class="modal-backdrop"></div>
+    </div>
+
+    <div id="settingsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="modal-card settings-card">
+        <header class="modal-header">
+          <div>
+            <div id="settingsTitle" class="modal-title">Settings</div>
+            <div class="modal-subtitle">Manage links, categories, icons, media, and private local data.</div>
+          </div>
+          <div class="header-actions">
+            <button id="saveSettingsBtn" class="primary-button" type="button">Save changes</button>
+            <button id="settingsClose" class="icon-button" type="button" title="Close">✕</button>
+          </div>
+        </header>
+
+        <div class="settings-layout">
+          <aside class="settings-tabs" aria-label="Settings sections">
+            <button class="tab-btn active" type="button" data-tab="links">🔗 Links</button>
+            <button class="tab-btn" type="button" data-tab="media">🖼️ Media</button>
+            <button class="tab-btn" type="button" data-tab="appearance">🎛️ Appearance</button>
+            <button class="tab-btn" type="button" data-tab="data">🧰 Data</button>
+          </aside>
+
+          <section class="settings-panel">
+            <div id="settingsNotice" class="notice hidden"></div>
+
+            <div class="tab-panel active" data-panel="links">
+              <div class="panel-heading">
+                <div>
+                  <h2>Links and categories</h2>
+                  <p>Create folders, choose icons, and enable or disable each link without editing code.</p>
+                </div>
+                <button id="addGroupBtn" class="secondary-button" type="button">+ Add category</button>
+              </div>
+              <label class="field full-field">
+                <span>Dashboard title</span>
+                <input id="linksTitleInput" type="text" autocomplete="off" />
+              </label>
+              <div id="groupsEditor" class="editor-list"></div>
+            </div>
+
+            <div class="tab-panel" data-panel="media">
+              <div class="panel-heading">
+                <div>
+                  <h2>Background media</h2>
+                  <p>Preview, play, disable, remove, or add photos and videos. Uploaded files are stored locally in your browser.</p>
+                </div>
+                <div class="split-actions">
+                  <label class="secondary-button file-button">
+                    Upload media
+                    <input id="mediaUploadInput" type="file" accept="image/*,video/*" multiple />
+                  </label>
+                  <button id="addMediaPathBtn" class="secondary-button" type="button">+ Add packaged path</button>
+                </div>
+              </div>
+              <div class="media-controls compact-grid">
+                <label class="field">
+                  <span>Mode</span>
+                  <select id="mediaModeInput">
+                    <option value="mixed">Photos + videos</option>
+                    <option value="photos">Photos only</option>
+                    <option value="videos">Videos only</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Video volume</span>
+                  <input id="videoVolumeInput" type="range" min="0" max="100" step="1" />
+                </label>
+                <label class="field">
+                  <span>Overlay shade</span>
+                  <input id="shadeStrengthInput" type="range" min="0" max="90" step="1" />
+                </label>
+                <label class="field">
+                  <span>Background blur</span>
+                  <input id="blurInput" type="range" min="0" max="16" step="1" />
+                </label>
+              </div>
+              <div id="mediaEditor" class="media-editor"></div>
+            </div>
+
+            <div class="tab-panel" data-panel="appearance">
+              <div class="panel-heading">
+                <div>
+                  <h2>Appearance</h2>
+                  <p>Tune the background fit and glass-card readability.</p>
+                </div>
+              </div>
+              <div class="compact-grid">
+                <label class="field">
+                  <span>Background scale</span>
+                  <input id="scaleInput" type="range" min="100" max="112" step="1" />
+                </label>
+                <label class="field check-field">
+                  <input id="openFirstGroupInput" type="checkbox" />
+                  <span>Open first category by default</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="tab-panel" data-panel="data">
+              <div class="panel-heading">
+                <div>
+                  <h2>Import, export and privacy</h2>
+                  <p>Your private edits live in Chrome local storage and local ignored files, not in the public repository.</p>
+                </div>
+              </div>
+              <div class="data-actions">
+                <button id="exportConfigBtn" class="secondary-button" type="button">Export JSON</button>
+                <label class="secondary-button file-button">
+                  Import JSON
+                  <input id="importConfigInput" type="file" accept="application/json,.json" />
+                </label>
+                <button id="reloadLocalBtn" class="secondary-button" type="button">Reload local JSON files</button>
+                <button id="resetSettingsBtn" class="danger-button" type="button">Reset to public defaults</button>
+              </div>
+              <pre id="privacyHelp" class="code-help"></pre>
+            </div>
+          </section>
+        </div>
+      </div>
+      <div class="modal-backdrop"></div>
+    </div>
+
+    <template id="groupTemplate">
+      <article class="editor-card group-editor-card">
+        <div class="editor-card-header">
+          <label class="mini-check"><input data-field="enabled" type="checkbox" /> Enabled</label>
+          <div class="editor-card-actions">
+            <button data-action="add-link" class="tiny-button" type="button">+ Link</button>
+            <button data-action="delete-group" class="tiny-button danger-text" type="button">Delete</button>
+          </div>
+        </div>
+        <div class="compact-grid">
+          <label class="field"><span>Name</span><input data-field="name" type="text" /></label>
+          <label class="field"><span>Icon</span><input data-field="icon" type="text" maxlength="4" /></label>
+        </div>
+        <div data-role="links" class="link-editor-list"></div>
+      </article>
+    </template>
+
+    <template id="linkTemplate">
+      <article class="link-editor-row">
+        <label class="mini-check"><input data-field="enabled" type="checkbox" /> Show</label>
+        <label class="field"><span>Label</span><input data-field="label" type="text" /></label>
+        <label class="field"><span>URL</span><input data-field="url" type="url" /></label>
+        <label class="field"><span>Note</span><input data-field="note" type="text" /></label>
+        <label class="field short-field"><span>Icon</span><input data-field="icon" type="text" maxlength="4" placeholder="auto" /></label>
+        <button data-action="delete-link" class="tiny-button danger-text" type="button">Delete</button>
+      </article>
+    </template>
+
+    <script src="newtab.js"></script>
+  </body>
+</html>

@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "NeTab",
+  "version": "2.0.0",
+  "description": "A private-first Chrome new tab dashboard with grouped quick links, random media backgrounds, widgets, and an in-browser settings panel.",
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  },
+  "permissions": [
+    "storage",
+    "favicon",
+    "unlimitedStorage"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; img-src 'self' data: blob: https: http:; media-src 'self' data: blob: https: http:; frame-src https://widgets.dastyar.io; connect-src 'self' data: blob: https: http:;"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "data/*",
+        "media/*"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ]
+}

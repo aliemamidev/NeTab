@@ -1,0 +1,31 @@
+# Local/private configuration
+.env
+.env.*
+!.env.example
+
+data/*.local.json
+
+# Personal media is intentionally private and heavy.
+# Keep the curated sample media only.
+media/*
+!media/.gitkeep
+!media/samples/
+!media/samples/**
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs and temporary files
+*.log
+tmp/
+temp/
+.cache/
+
+# Dependency/build output if the project is extended later
+node_modules/
+dist/
+build/
+coverage/

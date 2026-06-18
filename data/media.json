@@ -1,0 +1,37 @@
+{
+  "settings": {
+    "mode": "mixed",
+    "videoVolume": 0,
+    "shadeStrength": 64,
+    "blur": 0,
+    "scale": 102
+  },
+  "photos": [
+    {
+      "id": "sample-aurora",
+      "name": "Aurora Gradient",
+      "path": "media/samples/photos/aurora.svg",
+      "enabled": true
+    },
+    {
+      "id": "sample-orbit",
+      "name": "Orbit Gradient",
+      "path": "media/samples/photos/orbit.svg",
+      "enabled": true
+    },
+    {
+      "id": "sample-horizon",
+      "name": "Horizon Gradient",
+      "path": "media/samples/photos/horizon.svg",
+      "enabled": true
+    }
+  ],
+  "videos": [
+    {
+      "id": "sample-flow",
+      "name": "Soft Flow",
+      "path": "media/samples/videos/soft-flow.webm",
+      "enabled": true
+    }
+  ]
+}

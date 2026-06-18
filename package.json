@@ -1,0 +1,21 @@
+{
+  "name": "netab",
+  "version": "2.0.0",
+  "private": false,
+  "description": "Private-first Chrome new tab dashboard with grouped links, media backgrounds, widgets, and an in-browser settings panel.",
+  "type": "module",
+  "scripts": {
+    "test": "node scripts/validate.mjs && node --check newtab.js",
+    "validate": "node scripts/validate.mjs",
+    "sync:env": "node scripts/sync-env.mjs",
+    "zip": "node scripts/zip-release.mjs"
+  },
+  "keywords": [
+    "chrome-extension",
+    "new-tab",
+    "dashboard",
+    "quick-links",
+    "wallpaper"
+  ],
+  "license": "MIT"
+}

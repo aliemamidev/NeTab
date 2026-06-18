@@ -1,0 +1,78 @@
+{
+  "title": "Quick Links",
+  "groups": [
+    {
+      "id": "work",
+      "name": "Work",
+      "icon": "💼",
+      "enabled": true,
+      "links": [
+        {
+          "id": "github",
+          "label": "GitHub",
+          "note": "Code hosting and collaboration",
+          "url": "https://github.com/",
+          "enabled": true
+        },
+        {
+          "id": "microsoft",
+          "label": "Microsoft",
+          "note": "Microsoft products and services",
+          "url": "https://www.microsoft.com/",
+          "enabled": true
+        },
+        {
+          "id": "azure",
+          "label": "Azure",
+          "note": "Cloud services dashboard",
+          "url": "https://azure.microsoft.com/",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "ai-tools",
+      "name": "AI Tools",
+      "icon": "✨",
+      "enabled": true,
+      "links": [
+        {
+          "id": "openai",
+          "label": "OpenAI",
+          "note": "AI research and products",
+          "url": "https://openai.com/",
+          "enabled": true
+        },
+        {
+          "id": "chatgpt",
+          "label": "ChatGPT",
+          "note": "AI assistant workspace",
+          "url": "https://chatgpt.com/",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "id": "gaming",
+      "name": "Gaming",
+      "icon": "🎮",
+      "enabled": true,
+      "links": [
+        {
+          "id": "xbox",
+          "label": "Xbox",
+          "note": "Games, Game Pass and Xbox services",
+          "url": "https://www.xbox.com/",
+          "enabled": true
+        },
+        {
+          "id": "steam",
+          "label": "Steam",
+          "note": "PC games store and library",
+          "url": "https://store.steampowered.com/",
+          "enabled": true
+        }
+      ]
+    }
+  ]
+}
