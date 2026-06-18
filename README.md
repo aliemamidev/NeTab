@@ -1,6 +1,6 @@
 # NeTab
 
-**NeTab** is a private-first Chrome new tab dashboard. It gives you a beautiful start page with grouped quick links, random photo/video backgrounds, embedded widgets, and a full in-browser settings panel for editing everything without touching code.
+**NeTab** is a private-first Chrome new tab dashboard. It gives you a beautiful start page with grouped quick links, random photo/video backgrounds, lightweight built-in widgets, and a full in-browser settings panel for editing everything without touching code.
 
 The project is intentionally simple: no framework, no build step, no tracking, and no backend. It is just a Manifest V3 Chrome Extension made with HTML, CSS, and JavaScript.
 
@@ -10,7 +10,7 @@ The project is intentionally simple: no framework, no build step, no tracking, a
 
 NeTab replaces Chrome's default new tab page with a clean glass-style dashboard. You can organize links into categories, choose category icons, use automatic favicons or custom link icons, and open each folder with one click. The background changes randomly on every new tab and can use photos, videos, sample media, packaged local media, or files uploaded through the Settings panel.
 
-The Settings panel is the main control center. It lets you add, remove, disable, preview, and play media; tune video volume, shade, blur, and scale; add or remove link categories; edit links; choose icons; import/export the whole configuration; reload local ignored JSON files; and reset to safe public defaults.
+The Settings panel is the main control center. It lets you add, remove, disable, preview, and play media; tune video volume, shade, blur, and scale; add or remove link categories; edit links; choose icons; import/export the whole configuration; reload local ignored JSON files; and reset to safe public defaults. The public Chrome Web Store build intentionally avoids remote iframe widgets, broad host permissions, and remote JavaScript.
 
 ![NeTab link settings](docs/screenshots/settings-links.png)
 
@@ -147,7 +147,7 @@ The test validates the extension manifest, public JSON files, required files, an
 The repository includes `.github/workflows/ci.yml`. It runs automatically on pushes and pull requests to `main`:
 
 ```text
-checkout -> setup Node.js 22 -> npm test
+checkout@v5 -> setup-node@v6 -> Node.js 24 -> npm test -> npm run zip
 ```
 
 ## Create a public release ZIP
@@ -156,11 +156,14 @@ checkout -> setup Node.js 22 -> npm test
 npm run zip
 ```
 
-This creates:
+This creates two ZIP files:
 
 ```text
-release/netab-extension.zip
+release/netab-chrome-webstore.zip
+release/netab-public-source.zip
 ```
+
+Use `release/netab-chrome-webstore.zip` for Chrome Web Store uploads. It keeps `manifest.json` at the ZIP root and excludes development docs/scripts/private files from the store package.
 
 The release ZIP excludes `.env`, `data/*.local.json`, `node_modules`, personal `media/photos/*`, and personal `media/videos/*`.
 
@@ -187,6 +190,24 @@ The release ZIP excludes `.env`, `data/*.local.json`, `node_modules`, personal `
 ├── package.json
 └── README.md
 ```
+
+
+## Chrome Web Store readiness
+
+The public build is designed to be review-friendly:
+
+- Manifest V3 only
+- No remote hosted JavaScript
+- No external iframe widgets in the store package
+- No `<all_urls>` host permission
+- No `unlimitedStorage` permission
+- No web-accessible exposure for private data/media
+- Local storage only for user configuration
+- Public sample links and sample media only
+
+Chrome Web Store approval is ultimately controlled by Google's review process, so no project can honestly guarantee approval. This repository is prepared to avoid the common preventable rejection reasons.
+
+See [`PRIVACY.md`](PRIVACY.md) and [`STORE_LISTING.md`](STORE_LISTING.md) before submitting.
 
 ## Publishing safely
 

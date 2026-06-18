@@ -16,8 +16,6 @@ const EXT = {
   photos: new Set([".jpg", ".jpeg", ".png", ".webp", ".gif", ".svg"]),
   videos: new Set([".mp4", ".webm", ".ogg"]),
 };
-const FAVICON_TTL_MS = 120 * 60 * 60 * 1000;
-const FAVICON_MAX_BYTES = 256 * 1024;
 
 function $(id) {
   const el = document.getElementById(id);
@@ -370,8 +368,6 @@ const Config = (() => {
 })();
 
 const FaviconCache = (() => {
-  const pending = new Map();
-
   function normalizePageUrl(pageUrl) {
     try {
       const url = new URL(pageUrl);
@@ -385,25 +381,12 @@ const FaviconCache = (() => {
     try { return new URL(normalizePageUrl(pageUrl)).hostname; } catch { return ""; }
   }
 
-  function pageOrigin(pageUrl) {
-    try { return new URL(normalizePageUrl(pageUrl)).origin; } catch { return ""; }
-  }
-
-  function originKey(pageUrl) {
-    return pageOrigin(pageUrl) || pageUrl;
-  }
-
   function chromeFaviconUrl(pageUrl, size = 64) {
     if (!ExtensionAPI.isExtension) return "";
     const url = new URL(chrome.runtime.getURL("/_favicon/"));
     url.searchParams.set("pageUrl", normalizePageUrl(pageUrl));
     url.searchParams.set("size", String(size));
     return url.toString();
-  }
-
-  function rootIconUrls(pageUrl) {
-    const origin = pageOrigin(pageUrl);
-    return origin ? [`${origin}/favicon.ico`, `${origin}/favicon.png`, `${origin}/apple-touch-icon.png`] : [];
   }
 
   function fallbackDataUrl(pageUrl) {
@@ -414,90 +397,15 @@ const FaviconCache = (() => {
     return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
   }
 
-  function displayFallbackUrls(pageUrl) {
-    const host = pageHostname(pageUrl);
-    return [
-      chromeFaviconUrl(pageUrl),
-      ...rootIconUrls(pageUrl),
-      host ? `https://icons.duckduckgo.com/ip3/${host}.ico` : "",
-      `https://www.google.com/s2/favicons?domain_url=${encodeURIComponent(normalizePageUrl(pageUrl))}&sz=64`,
-      fallbackDataUrl(pageUrl),
-    ].filter(Boolean);
-  }
-
-  function blobToDataUrl(blob) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = () => reject(reader.error || new Error("Failed to read icon"));
-      reader.readAsDataURL(blob);
-    });
-  }
-
-  async function fetchIcon(url) {
-    const res = await fetch(url, { cache: "reload", credentials: "omit", redirect: "follow" });
-    if (!res.ok) throw new Error(`Icon candidate returned ${res.status}`);
-    const blob = await res.blob();
-    const type = (blob.type || res.headers.get("content-type") || "").toLowerCase();
-    if (!blob.size || blob.size > FAVICON_MAX_BYTES) throw new Error("Invalid icon size");
-    if (type && !type.startsWith("image/") && !type.includes("svg") && !type.includes("xml") && !type.includes("octet-stream")) {
-      throw new Error(`Not an image: ${type}`);
-    }
-    return blobToDataUrl(blob);
-  }
-
-  async function resolveDataUrl(pageUrl) {
-    for (const url of displayFallbackUrls(pageUrl)) {
-      try { return await fetchIcon(url); } catch { /* try next */ }
-    }
-    return fallbackDataUrl(pageUrl);
-  }
-
-  function useFallbacks(imgEl, pageUrl) {
-    const urls = displayFallbackUrls(pageUrl);
-    let index = 0;
-    const next = () => {
-      const url = urls[index++];
-      if (!url) {
-        imgEl.classList.add("favicon-missing");
-        imgEl.removeAttribute("src");
-        return;
-      }
-      imgEl.src = url;
-    };
-    imgEl.onerror = next;
-    next();
-  }
-
-  async function setImg(imgEl, pageUrl) {
-    const key = `favicon:${originKey(pageUrl)}`;
-    const cached = await ExtensionAPI.storageGet(key);
-    const now = Date.now();
+  function setImg(imgEl, pageUrl) {
     imgEl.classList.remove("favicon-missing");
-
-    if (cached?.dataUrl) {
-      imgEl.onerror = () => useFallbacks(imgEl, pageUrl);
-      imgEl.src = cached.dataUrl;
-    } else {
-      useFallbacks(imgEl, pageUrl);
-    }
-
-    if (cached?.dataUrl && cached?.expiresAt > now) return;
-    if (!pending.has(key)) {
-      pending.set(key, (async () => {
-        const dataUrl = await resolveDataUrl(pageUrl);
-        await ExtensionAPI.storageSet(key, { dataUrl, cachedAt: now, expiresAt: now + FAVICON_TTL_MS });
-        return dataUrl;
-      })().finally(() => pending.delete(key)));
-    }
-
-    try {
-      const dataUrl = await pending.get(key);
-      imgEl.onerror = () => useFallbacks(imgEl, pageUrl);
-      imgEl.src = dataUrl;
-    } catch {
-      useFallbacks(imgEl, pageUrl);
-    }
+    const fallback = fallbackDataUrl(pageUrl);
+    const chromeUrl = chromeFaviconUrl(pageUrl);
+    imgEl.onerror = () => {
+      imgEl.onerror = null;
+      imgEl.src = fallback;
+    };
+    imgEl.src = chromeUrl || fallback;
   }
 
   return { setImg };
@@ -1053,17 +961,63 @@ const SettingsUI = (() => {
 })();
 
 const WidgetsUI = (() => {
-  function init() {
+  let timer = null;
+
+  function updateClock() {
+    const now = new Date();
+    const clock = document.getElementById("clockWidget");
+    const date = document.getElementById("dateWidget");
+    if (clock) {
+      clock.textContent = new Intl.DateTimeFormat(undefined, {
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(now);
+    }
+    if (date) {
+      date.textContent = new Intl.DateTimeFormat(undefined, {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }).format(now);
+    }
+  }
+
+  function updateStats(state) {
+    const groups = state?.links?.groups || [];
+    const linkCount = groups.reduce((sum, group) => sum + (group.links || []).filter((link) => link.enabled).length, 0);
+    const media = state?.media || {};
+    const photoCount = (media.photos || []).filter((item) => item.enabled).length;
+    const videoCount = (media.videos || []).filter((item) => item.enabled).length;
+    const linkEl = document.getElementById("linkCountWidget");
+    const mediaEl = document.getElementById("mediaCountWidget");
+    if (linkEl) linkEl.textContent = `${linkCount} links`;
+    if (mediaEl) mediaEl.textContent = `${photoCount} photos · ${videoCount} videos`;
+  }
+
+  function init(state) {
     const btn = $("widgetsBtn");
     const modal = $("widgetsModal");
     const closeBtn = $("widgetsClose");
-    const open = () => modal.classList.remove("hidden");
-    const close = () => modal.classList.add("hidden");
+    const open = () => {
+      updateClock();
+      updateStats(state);
+      modal.classList.remove("hidden");
+      window.clearInterval(timer);
+      timer = window.setInterval(updateClock, 30_000);
+    };
+    const close = () => {
+      modal.classList.add("hidden");
+      window.clearInterval(timer);
+      timer = null;
+    };
     btn.addEventListener("click", open);
     closeBtn.addEventListener("click", close);
     modal.addEventListener("click", (e) => {
       if (e.target?.classList?.contains("modal-backdrop")) close();
     });
+    updateClock();
+    updateStats(state);
   }
   return { init };
 })();
@@ -1072,7 +1026,7 @@ const WidgetsUI = (() => {
   try {
     const loaded = await Config.loadAll();
     LinksUI.render(loaded.links, loaded.ui);
-    WidgetsUI.init();
+    WidgetsUI.init({ links: loaded.links, media: loaded.media });
     await SettingsUI.init({ links: loaded.links, media: loaded.media, ui: loaded.ui });
     Background.init(loaded.media).catch((e) => {
       console.error("Background failed", e);

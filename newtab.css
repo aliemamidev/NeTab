@@ -164,3 +164,8 @@ p { margin: 5px 0 0; color: var(--faint); font-size: 13px; line-height: 1.45; }
   .panel-heading { align-items: flex-start; flex-direction: column; }
   .header-actions { justify-content: flex-end; }
 }
+
+.local-widgets-grid { align-items: stretch; }
+.local-widget-card { min-height: 180px; display: flex; flex-direction: column; justify-content: center; }
+.widget-big-value { margin-top: 18px; font-size: clamp(32px, 7vw, 68px); font-weight: 850; letter-spacing: -0.05em; line-height: 1; }
+.widget-small-value { margin-top: 12px; color: var(--muted); font-size: 13px; line-height: 1.5; }

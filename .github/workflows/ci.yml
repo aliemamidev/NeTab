@@ -15,12 +15,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: '24'
 
-      - name: Run validation
+      - name: Show tool versions
+        run: |
+          node --version
+          npm --version
+
+      - name: Validate source
         run: npm test
+
+      - name: Build Chrome Web Store package
+        run: npm run zip
+
+      - name: Validate packaged ZIP
+        run: |
+          test -f release/netab-chrome-webstore.zip
+          unzip -l release/netab-chrome-webstore.zip | grep -q 'manifest.json'
+          unzip -l release/netab-chrome-webstore.zip | grep -q 'newtab.html'
+          if unzip -l release/netab-chrome-webstore.zip | grep -E '\.(env)$|links\.local\.json|media\.local\.json|media/photos/|media/videos/|node_modules/|\.git/' ; then
+            echo 'Private or heavy files leaked into release ZIP.' >&2
+            exit 1
+          fi

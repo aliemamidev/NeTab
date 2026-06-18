@@ -40,14 +40,16 @@
           </div>
           <button id="widgetsClose" class="icon-button" type="button" title="Close">✕</button>
         </header>
-        <div class="widgets-grid">
-          <article class="widget-box">
-            <div class="widget-title">Gold Widget</div>
-            <iframe class="widget-frame" src="https://widgets.dastyar.io/fa/melli-gold?theme=dark" loading="lazy" referrerpolicy="no-referrer"></iframe>
+        <div class="widgets-grid local-widgets-grid">
+          <article class="widget-box local-widget-card">
+            <div class="widget-title">Local Time</div>
+            <div id="clockWidget" class="widget-big-value">--:--</div>
+            <div id="dateWidget" class="widget-small-value">Loading date…</div>
           </article>
-          <article class="widget-box">
-            <div class="widget-title">Price Widget</div>
-            <iframe class="widget-frame" src="https://widgets.dastyar.io/fa/dastyar-price?theme=dark" loading="lazy" referrerpolicy="no-referrer"></iframe>
+          <article class="widget-box local-widget-card">
+            <div class="widget-title">Dashboard Status</div>
+            <div id="linkCountWidget" class="widget-big-value">0</div>
+            <div id="mediaCountWidget" class="widget-small-value">links and media are stored locally</div>
           </article>
         </div>
       </div>
