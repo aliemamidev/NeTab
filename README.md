@@ -6,6 +6,11 @@ The project is intentionally simple: no framework, no build step, no tracking, a
 
 ![NeTab dashboard](docs/screenshots/dashboard.png)
 
+# NeTab in my PC
+
+![NeTab in PC](docs/screenshots/example.jpg)
+
+
 ## What it does
 
 NeTab replaces Chrome's default new tab page with a clean glass-style dashboard. You can organize links into categories, choose category icons, use automatic favicons or custom link icons, and open each folder with one click. The background changes randomly on every new tab and can use photos, videos, sample media, packaged local media, or files uploaded through the Settings panel.
